@@ -29,6 +29,13 @@ python app.py
 
 Then open http://127.0.0.1:10000 in your browser.
 
+## Deploy
+
+The repo is ready to host for free on either platform:
+
+- **Render:** New → Blueprint → pick this repo. `render.yaml` sets up the build and runs the app with gunicorn.
+- **Hugging Face Spaces:** create a Space with the Docker SDK and push this repo to it. The `Dockerfile` serves the app on port 7860.
+
 ## Files
 
 | File | Purpose |
@@ -39,3 +46,4 @@ Then open http://127.0.0.1:10000 in your browser.
 | `Cleaned Car.csv` | Cleaned dataset |
 | `LinearRegressionModel.pkl` | Trained pipeline |
 | `templates/`, `static/` | Web form and styling |
+| `render.yaml`, `Dockerfile` | Hosting configuration |
