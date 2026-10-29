@@ -10,10 +10,10 @@ A web app that estimates the resale price of a used car from its make, model, ye
 
 ## How it works
 
-1. **Clean the data** (`Predictor.ipynb`): 892 raw Quikr car listings cleaned into `Cleaned Car.csv` (fixing prices, years, kilometers and names, removing outliers).
-2. **Build the pipeline**: one-hot encode the categorical columns (name, company, fuel type) with a `ColumnTransformer`, then fit `LinearRegression`, all in one scikit-learn `Pipeline`.
-3. **Evaluate**: R² of about 0.73 on a held-out 20% test split.
-4. **Serve** (`app.py`): the trained pipeline is pickled to `LinearRegressionModel.pkl` and loaded by Flask. The form in `templates/index.html` fills the model list from the chosen company and posts to `/predict`.
+1. **Clean the data** (`Predictor.ipynb`): 892 raw Quikr car listings cleaned into `Cleaned Car.csv` (fixing prices, years, kilometers and names, removing outliers), leaving 815 cars.
+2. **Build the pipeline** (`train.py`): one-hot encode the categorical columns (name, company, fuel type) with a `ColumnTransformer`, then fit `LinearRegression`, all in one scikit-learn `Pipeline`. Car names the model has never seen are handled instead of crashing.
+3. **Evaluate**: R² of 0.64 ± 0.10 with 5-fold cross-validation (0.57 on a fixed 20% hold-out split, mean absolute error about ₹148k). The final model is refit on all the data.
+4. **Serve** (`app.py`): Flask loads the trained pipeline from `LinearRegressionModel.pkl`, and retrains it automatically from the CSV if the file is missing or was saved by an incompatible scikit-learn version. The form in `templates/index.html` fills the model list from the chosen company and posts to `/predict`, which validates the input before predicting.
 
 ## Tech stack
 
@@ -23,19 +23,19 @@ Python · Pandas · scikit-learn · Flask · HTML / CSS / JavaScript
 
 ```bash
 pip install -r requirements.txt
+python train.py   # optional: retrain and print the evaluation metrics
 python app.py
 ```
 
 Then open http://127.0.0.1:10000 in your browser.
-
-> `requirements.txt` pins older versions (scikit-learn 0.22, Flask 1.1) to match the saved model. Use a Python 3.7 or 3.8 virtual environment if the newest Python can't install them.
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
 | `app.py` | Flask app and `/predict` endpoint |
-| `Predictor.ipynb` | Data cleaning, training and evaluation |
+| `Predictor.ipynb` | Data exploration and cleaning |
+| `train.py` | Reproducible training and evaluation |
 | `Cleaned Car.csv` | Cleaned dataset |
 | `LinearRegressionModel.pkl` | Trained pipeline |
 | `templates/`, `static/` | Web form and styling |
